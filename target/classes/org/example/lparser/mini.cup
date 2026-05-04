@@ -1,0 +1,99 @@
+package org.example.lparser;
+import java_cup.runtime.*;
+import java.util.*;
+import org.example.ast.*;
+
+parser code {:
+    public void report_error(String message, Object info) {
+        StringBuffer m = new StringBuffer("Error sintactico");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+            if (s.left >= 0) {
+                m.append(" en linea " + (s.left + 1));
+                if (s.right >= 0)
+                    m.append(", columna " + (s.right + 1));
+            }
+        }
+        m.append(": " + message);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+
+/* Terminales */
+terminal           SEMI, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, ASSIGN;
+terminal           INTEGER, RETURN, IF, ELSE, WHILE;
+terminal Integer   NUMBER;
+terminal String    ID;
+
+/* No terminales */
+non terminal ProgramNode       program;
+non terminal List<StmtNode>    statements;
+non terminal StmtNode          statement;
+non terminal ExpNode           exp;
+non terminal ValNode           value;
+
+/* Gramatica segun el TP */
+
+program ::= INTEGER:t ID:name LPAREN RPAREN LBRACE statements:stmts RBRACE
+{:
+    RESULT = new ProgramNode(t, name, stmts);
+:}
+;
+
+statements ::= statement:s
+{:
+    List<StmtNode> list = new ArrayList<StmtNode>();
+    list.add(s);
+    RESULT = list;
+:}
+| statement:s statements:rest
+{:
+    List<StmtNode> list = new ArrayList<StmtNode>();
+    list.add(s);
+    list.addAll(rest);
+    RESULT = list;
+:}
+;
+
+statement ::= ID:name ASSIGN exp:e SEMI
+{:
+    RESULT = new AssignStmt(name, e);
+:}
+| RETURN exp:e SEMI
+{:
+    RESULT = new ReturnStmt(e);
+:}
+| IF LPAREN exp:cond RPAREN LBRACE statements:then_s RBRACE ELSE LBRACE statements:else_s RBRACE
+{:
+    RESULT = new IfStmt(cond, then_s, else_s);
+:}
+| WHILE LPAREN exp:cond RPAREN LBRACE statements:body RBRACE
+{:
+    RESULT = new WhileStmt(cond, body);
+:}
+;
+
+exp ::= value:v1 PLUS value:v2
+{:
+    RESULT = new BinOpExp(v1, v2);
+:}
+| value:v
+{:
+    RESULT = v;
+:}
+;
+
+value ::= ID:name
+{:
+    RESULT = new VarVal(name);
+:}
+| NUMBER:n
+{:
+    RESULT = new NumVal(n);
+:}
+;

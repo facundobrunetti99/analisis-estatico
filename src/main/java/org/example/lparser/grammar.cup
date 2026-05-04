@@ -1,0 +1,110 @@
+package org.example.lparser;
+import java_cup.runtime.*;
+import java.util.*;
+import org.example.ast.*;
+
+parser code {:
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error sintactico");
+        if (info instanceof Symbol) {
+            Symbol s = (Symbol) info;
+            if (s.left >= 0) {
+                m.append(" en linea ").append(s.left + 1);
+                if (s.right >= 0)
+                    m.append(", columna ").append(s.right + 1);
+            }
+        }
+        m.append(": ").append(message);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+
+/* ===== TERMINALES ===== */
+terminal           SEMI, PLUS, LPAREN, RPAREN, LBRACE, RBRACE, ASSIGN;
+terminal           INTEGER, RETURN, IF, ELSE, WHILE;
+terminal Integer   NUMBER;
+terminal String    ID;
+
+/* ===== NO TERMINALES ===== */
+non terminal ProgramNode         program;
+non terminal List<StatementNode> statements;
+non terminal StatementNode       statement;
+non terminal ExpressionNode      exp;
+non terminal ExpressionNode      value;
+
+/* ===== GRAMATICA ===== */
+/*
+  PROGRAM   -> TYPE ID () { STATEMENTS }
+  TYPE      -> integer
+  STATEMENTS-> STATEMENT | STATEMENT STATEMENTS
+  STATEMENT -> ID = EXP ;
+             | return EXP ;
+             | if ( EXP ) { STATEMENTS } else { STATEMENTS }
+             | while ( EXP ) { STATEMENTS }
+  EXP       -> VALUE | VALUE + VALUE
+  VALUE     -> ID | NUMBER
+*/
+
+program ::= INTEGER ID:name LPAREN RPAREN LBRACE statements:sl RBRACE
+{:
+    RESULT = new ProgramNode(name, sl);
+:}
+;
+
+statements ::= statement:s
+{:
+    List<StatementNode> list = new ArrayList<>();
+    list.add(s);
+    RESULT = list;
+:}
+| statement:s statements:sl
+{:
+    List<StatementNode> list = new ArrayList<>();
+    list.add(s);
+    list.addAll(sl);
+    RESULT = list;
+:}
+;
+
+statement ::= ID:name ASSIGN exp:e SEMI
+{:
+    RESULT = new AssignNode(name, e);
+:}
+| RETURN exp:e SEMI
+{:
+    RESULT = new ReturnNode(e);
+:}
+| IF LPAREN exp:c RPAREN LBRACE statements:th RBRACE ELSE LBRACE statements:el RBRACE
+{:
+    RESULT = new IfNode(c, th, el);
+:}
+| WHILE LPAREN exp:c RPAREN LBRACE statements:body RBRACE
+{:
+    RESULT = new WhileNode(c, body);
+:}
+;
+
+exp ::= value:v
+{:
+    RESULT = v;
+:}
+| value:v1 PLUS value:v2
+{:
+    RESULT = new BinaryOpNode(v1, "+", v2);
+:}
+;
+
+value ::= ID:name
+{:
+    RESULT = new VarNode(name);
+:}
+| NUMBER:n
+{:
+    RESULT = new NumNode(n);
+:}
+;
