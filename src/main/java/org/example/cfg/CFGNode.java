@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Bloque basico en el CFG.
+ *bloque basico en el CFG.
  */
 public class CFGNode {
     private static int counter = 0;

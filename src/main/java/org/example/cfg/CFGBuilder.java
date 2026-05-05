@@ -3,27 +3,26 @@ package org.example.cfg;
 import org.example.ast.*;
 import java.util.List;
 
-/**
- * Construye el CFG a partir del AST.
- * Cada metodo buildXxx recibe "next" (continuation) y retorna el primer bloque del sub-arbol.
- */
 public class CFGBuilder {
 
-    private final CFGNode entry;
-    private final CFGNode exit;
+    private CFGNode entry;
+    private CFGNode exit;
 
     public CFGBuilder() {
         CFGNode.resetCounter();
         entry = new CFGNode("ENTRY");
         entry.isEntry = true;
-        exit  = new CFGNode("EXIT");
-        exit.isExit  = true;
+       
     }
 
     public CFGNode getEntry() { return entry; }
     public CFGNode getExit()  { return exit;  }
 
     public void build(ProgramNode program) {
+        
+        exit = new CFGNode("EXIT");
+        exit.isExit = true;
+
         CFGNode first = buildStatements(program.statements, exit);
         entry.addSuccessor(first);
     }

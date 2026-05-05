@@ -1,0 +1,18 @@
+digraph PostDomTree {
+  node [shape=ellipse, fontname="Courier"];
+  rankdir=BT;
+  B0 [label="ENTRY", style=filled, fillcolor=lightblue];
+  B6 [label="x = 3"];
+  B5 [label="if (y)"];
+  B3 [label="z = x + 1"];
+  B4 [label="y = x + z"];
+  B2 [label="return z"];
+  B1 [label="EXIT", style=filled, fillcolor=lightyellow];
+
+  B0 -> B2 [label="ipost-dom"];
+  B6 -> B2 [label="ipost-dom"];
+  B5 -> B2 [label="ipost-dom"];
+  B3 -> B2 [label="ipost-dom"];
+  B4 -> B2 [label="ipost-dom"];
+  B2 -> B1 [label="ipost-dom"];
+}

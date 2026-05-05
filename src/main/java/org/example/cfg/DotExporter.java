@@ -4,11 +4,11 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Exporta CFG, arbol de post-dominadores y CDG al formato DOT (Graphviz).
+ *exporta CFG, arbol de post-dominadores y CDG al formato DOT (Graphviz).
  */
 public class DotExporter {
 
-    /** Exporta el CFG */
+    /*exporta el CFG */
     public static String cfgToDot(List<CFGNode> nodes) {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph CFG {\n");
@@ -32,12 +32,12 @@ public class DotExporter {
         return sb.toString();
     }
 
-    /** Exporta el arbol de post-dominadores usando los IPD */
+    /**exporta el arbol de post-dominadores usando los IPD */
     public static String postDomTreeToDot(List<CFGNode> nodes, Map<CFGNode, CFGNode> ipd) {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph PostDomTree {\n");
         sb.append("  node [shape=ellipse, fontname=\"Courier\"];\n");
-        sb.append("  rankdir=BT;\n");   // bottom-to-top: hijos abajo, raiz arriba
+        sb.append("  rankdir=BT;\n");   //bottom-to-top: hijos abajo, raiz arriba
 
         for (CFGNode n : nodes) {
             String style = "";
@@ -49,7 +49,7 @@ public class DotExporter {
         }
         sb.append("\n");
         for (Map.Entry<CFGNode, CFGNode> e : ipd.entrySet()) {
-            // e.getKey() es post-dominado por e.getValue() (su padre en el arbol)
+            //e.getKey() es post-dominado por e.getValue() (su padre en el arbol)
             sb.append("  ").append(e.getKey().dotId())
               .append(" -> ").append(e.getValue().dotId())
               .append(" [label=\"ipost-dom\"];\n");
@@ -58,7 +58,7 @@ public class DotExporter {
         return sb.toString();
     }
 
-    /** Exporta el CDG */
+    /*exporta el CDG */
     public static String cdgToDot(List<CFGNode> nodes, Map<CFGNode, Set<CFGNode>> cdg) {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph CDG {\n");

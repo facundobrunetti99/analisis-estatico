@@ -3,7 +3,7 @@ package org.example.cfg;
 import java.util.*;
 
 /**
- * Recolecta todos los nodos del CFG haciendo BFS desde ENTRY.
+ *recolecta todos los nodos del CFG haciendo BFS desde ENTRY.
  */
 public class CFGCollector {
 

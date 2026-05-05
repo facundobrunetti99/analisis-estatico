@@ -81,27 +81,36 @@ public class PostDominator {
      *IPD(n) = el nodo m en PostDomEst(n) tal que m in PostDom(p) para todo p in PostDomEst(n)
      */
     public Map<CFGNode, CFGNode> computeIPD() {
-        Map<CFGNode, CFGNode> ipd = new LinkedHashMap<>();
-        for (CFGNode n : nodes) {
-            if (n == exit) continue;
-            Set<CFGNode> strict = new LinkedHashSet<>(postDom.get(n));
-            strict.remove(n);
-            if (strict.isEmpty()) continue;
+    Map<CFGNode, CFGNode> ipd = new LinkedHashMap<>();
+    for (CFGNode n : nodes) {
+        if (n == exit) continue;
 
-            //El IPD es el nodo en strict que es post-dominado por todos los demas
-            CFGNode candidate = null;
-            for (CFGNode m : strict) {
-                boolean dominated = true;
-                for (CFGNode p : strict) {
-                    if (p == m) continue;
-                    if (!postDom.get(p).contains(m)) { dominated = false; break; }
-                }
-                if (dominated) { candidate = m; break; }
+        Set<CFGNode> strict = new LinkedHashSet<>(postDom.get(n));
+        strict.remove(n);
+        if (strict.isEmpty()) continue;
+
+        // El IPD es el elemento de strict con el PostDom MAS PEQUEÑO
+        // (el mas cercano en el arbol = el que post-domina a menos nodos)
+        // pero que NO sea EXIT salvo que sea el unico candidato
+        CFGNode candidate = null;
+        int minSize = Integer.MAX_VALUE;
+
+        for (CFGNode m : strict) {
+            if (m == exit) continue; // saltar EXIT en primera pasada
+            int size = postDom.getOrDefault(m, Collections.emptySet()).size();
+            if (size < minSize) {
+                minSize = size;
+                candidate = m;
             }
-            if (candidate != null) ipd.put(n, candidate);
         }
-        return ipd;
+
+        // si no encontro nada (solo habia EXIT en strict), usar EXIT
+        if (candidate == null) candidate = exit;
+
+        ipd.put(n, candidate);
     }
+    return ipd;
+}
 
     public Map<CFGNode, Set<CFGNode>> getAllPostDom() { return postDom; }
 }

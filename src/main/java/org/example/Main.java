@@ -9,16 +9,6 @@ import org.example.cfg.*;
 import org.example.lparser.parser;
 import org.example.lparser.sym;
 
-/**
- * TP1 - Analisis Estatico de Programas
- * Genera: CFG, Post-dominadores, Arbol de Post-dominadores, CDG.
- *
- * EJECUCION:
- *   java -cp "target/classes;java-cup-11b-runtime.jar" org.example.Main programa.txt
- *
- * GENERA archivos .dot en el mismo directorio del archivo de entrada.
- * Para visualizar: dot -Tpng cfg.dot -o cfg.png
- */
 public class Main {
 
     public static void main(String[] args) throws Exception {
@@ -44,7 +34,7 @@ public class Main {
         System.out.println("Archivo: " + inputFile);
         System.out.println("=".repeat(60));
 
-        // ---- 1. Parsing ----
+        //Parsing
         System.out.println("\n[1] Parseando...");
         FileReader reader = new FileReader(file);
         Lexer lexer = new Lexer(reader);
@@ -53,7 +43,7 @@ public class Main {
         ProgramNode program = (ProgramNode) result.value;
         System.out.println("    OK - funcion: " + program.functionName);
 
-        // ---- 2. CFG ----
+        //CFG
         System.out.println("\n[2] Generando CFG...");
         CFGBuilder builder = new CFGBuilder();
         builder.build(program);
@@ -63,12 +53,12 @@ public class Main {
         List<CFGNode> nodes = CFGCollector.collect(entry);
         System.out.println("    " + nodes.size() + " bloques generados");
 
-        // ---- 3. Post-dominadores ----
+        //Post-dominadores
         System.out.println("\n[3] Computando Post-dominadores...");
         PostDominator pd = new PostDominator(nodes, exit);
         pd.compute();
 
-        // Mostrar tabla de post-dominadores
+        //Mostrar tabla de post-dominadores
         System.out.println("    Tabla de Post-Dominadores:");
         for (CFGNode n : nodes) {
             System.out.print("      PostDom(" + n.dotId() + " [" + n.dotLabel() + "]) = { ");
@@ -78,7 +68,7 @@ public class Main {
             System.out.println("}");
         }
 
-        // ---- 4. Arbol de post-dominadores ----
+        //Arbol de post-dominadores 
         System.out.println("\n[4] Construyendo Arbol de Post-dominadores...");
         Map<CFGNode, CFGNode> ipd = pd.computeIPD();
         System.out.println("    Post-dominadores inmediatos (IPD):");
@@ -87,7 +77,7 @@ public class Main {
                 + e.getValue().dotId() + " [" + e.getValue().dotLabel() + "]");
         }
 
-        // ---- 5. CDG ----
+        //CDG
         System.out.println("\n[5] Construyendo CDG...");
         CDGBuilder cdgBuilder = new CDGBuilder(nodes, pd);
         cdgBuilder.compute();
@@ -106,7 +96,7 @@ public class Main {
         }
         if (!anyDep) System.out.println("      (ninguna dependencia de control detectada)");
 
-        // ---- 6. Exportar DOT ----
+        //Exportar DOT
         System.out.println("\n[6] Exportando archivos DOT...");
         String base = inputFile.replace(".txt", "");
 
