@@ -116,20 +116,14 @@ java -cp "target/classes:java-cup-11b-runtime.jar" org.example.Main programa.txt
 ```
 
 ### Paso 4: Visualizar los grafos (requiere Graphviz instalado)
-
+### Instalarlo desde aqui-> https://graphviz.org/download/
+## Una vez instalado agregarlo al PATH D:\Graphviz-14.1.5-win64\bin (Buscar la ruta donde se encuentre)
+## Ejecutando estos comandos se generara unos archivos png, donde mostraran graficamente 
 ```
 dot -Tpng programa_cfg.dot  -o programa_cfg.png
 dot -Tpng programa_pdom.dot -o programa_pdom.png
 dot -Tpng programa_cdg.dot  -o programa_cdg.png
 ```
-
-O en un solo comando:
-```
-for f in programa_cfg programa_pdom programa_cdg; do dot -Tpng $f.dot -o $f.png; done
-```
-
----
-
 ## Salida esperada (consola)
 
 ```
