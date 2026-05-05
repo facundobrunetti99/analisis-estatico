@@ -64,13 +64,13 @@ TP1_AEP/
 ├── java-cup-11b-runtime.jar               ← runtime de CUP
 └── src/main/java/org/example/
     ├── Main.java                          ← punto de entrada
-    ├── Lexer.java                         ← generado por JFlex, NO editar
+    ├── Lexer.java                         ← generado por JFlex
     ├── lexer/
     │   └── lexer.flex                     ← especificación del lexer
     ├── lparser/
     │   ├── grammar.cup                    ← gramática CUP
-    │   ├── parser.java                    ← generado por CUP, NO editar
-    │   └── sym.java                       ← generado por CUP, NO editar
+    │   ├── parser.java                    ← generado por CUP
+    │   └── sym.java                       ← generado por CUP
     ├── ast/
     │   ├── ASTNode.java
     │   ├── StatementNode.java
