@@ -18,6 +18,10 @@ Dado un programa en el **mini-lenguaje** definido por el TP, genera automáticam
 | 2 | **Post-dominadores** | Algoritmo iterativo de punto fijo |
 | 3 | **Árbol de Post-dominadores** | Usando IPD (post-dominador inmediato) |
 | 4 | **CDG** | Control Dependence Graph |
+| 5 | **Reaching Definitions** | IN/OUT por nodo del CFG |
+| 6 | **DDG** | Data Dependence Graph desde pares Definición-Uso |
+| 7 | **PDG** | Unión del CDG y DDG |
+| 8 | **Program Slice** | Recorrido hacia atrás sobre CDG + DDG |
 
 Los grafos se exportan en formato **DOT (Graphviz)** y se pueden convertir a imágenes PNG.
 
@@ -122,6 +126,12 @@ mvn clean compile
 java -cp "target/classes;java-cup-11b-runtime.jar" org.example.Main programa.txt
 ```
 
+Para calcular un slice, pasar un segundo argumento con el nodo (`B2`) o la línea del archivo:
+
+```powershell
+java -cp "target/classes;java-cup-11b-runtime.jar" org.example.Main programa.txt B2
+```
+
 **Linux / Mac:**
 ```bash
 java -cp "target/classes:java-cup-11b-runtime.jar" org.example.Main programa.txt
@@ -137,6 +147,8 @@ java -cp "target/classes:java-cup-11b-runtime.jar" org.example.Main programa.txt
 dot -Tpng programa_cfg.dot  -o programa_cfg.png
 dot -Tpng programa_pdom.dot -o programa_pdom.png
 dot -Tpng programa_cdg.dot  -o programa_cdg.png
+dot -Tpng programa_ddg.dot  -o programa_ddg.png
+dot -Tpng programa_pdg.dot  -o programa_pdg.png
 ```
 
 ---
@@ -162,7 +174,7 @@ dot -Tpng programa_cdg.dot  -o programa_cdg.png
 
 [4] Construyendo Árbol de Post-dominadores...
     Post-dominadores inmediatos (IPD):
-      IPD(B1 [x = 3]) = B6 [EXIT]
+      IPD(B6 [x = 3]) = B5 [if (y)]
       ...
 
 [5] Construyendo CDG...
@@ -174,6 +186,9 @@ dot -Tpng programa_cdg.dot  -o programa_cdg.png
     CFG  → programa_cfg.dot
     PDOM → programa_pdom.dot
     CDG  → programa_cdg.dot
+    DDG  → programa_ddg.dot
+    PDG  → programa_pdg.dot
+    SLICE CFG -> programa_slice_B2.dot   # si se pidio slice
 ============================================================
 ```
 
@@ -217,3 +232,11 @@ El **IPD** (post-dominador inmediato) de `n` es el único elemento de `PostDomEs
 ### CDG — Control Dependence Graph
 
 Para cada arista `(A → B)` del CFG donde `B` **no** post-domina a `A`: se sube desde `B` por el árbol de post-dominadores hasta `IPD(A)`, marcando cada nodo visitado como **control-dependiente de A**.
+
+Además, los nodos que no dependen de ninguna condición quedan conectados al nodo inicial (`ENTRY`) como primer nivel del CDG.
+
+### Reaching Definitions, DDG y Slicing
+
+El algoritmo de **Reaching Definitions** calcula los conjuntos `IN` y `OUT` de cada nodo. A partir de `IN(n)` y de las variables usadas en `n`, se generan los pares **Definición-Uso** y el **DDG**.
+
+El **PDG** se exporta como la unión del CDG y el DDG. El **program slice** toma un nodo/línea como criterio y recorre el PDG hacia atrás por dependencias de control y de datos; los nodos alcanzados forman el slice. Si se pide un slice, también se exporta un CFG reducido con las instrucciones seleccionadas.

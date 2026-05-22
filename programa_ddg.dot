@@ -1,4 +1,4 @@
-digraph CDG {
+digraph DDG {
   node [shape=box, fontname="Courier"];
   B0 [label="ENTRY", style=filled, fillcolor=lightblue];
   B6 [label="x = 3"];
@@ -8,9 +8,7 @@ digraph CDG {
   B2 [label="return z"];
   B1 [label="EXIT", style=filled, fillcolor=lightyellow];
 
-  B0 -> B6 [style=dashed, color=red];
-  B0 -> B5 [style=dashed, color=red];
-  B5 -> B3 [style=dashed, color=red];
-  B5 -> B4 [style=dashed, color=red];
-  B0 -> B2 [style=dashed, color=red];
+  B6 -> B3 [color=blue, label="x"];
+  B6 -> B4 [color=blue, label="x"];
+  B3 -> B2 [color=blue, label="z"];
 }
