@@ -78,39 +78,40 @@ public class PostDominator {
      *calcula el post-dominador inmediato (IPD) de cada nodo:
      *el post-dominador estricto mas cercano.
      *postDomEst(n) = PostDom(n) - {n}
-     *IPD(n) = el nodo m en PostDomEst(n) tal que m in PostDom(p) para todo p in PostDomEst(n)
+     *IPD(n) = el nodo m en PostDomEst(n) tal que todos los demas
+     *post-dominadores estrictos de n tambien post-dominan a m.
      */
     public Map<CFGNode, CFGNode> computeIPD() {
-    Map<CFGNode, CFGNode> ipd = new LinkedHashMap<>();
-    for (CFGNode n : nodes) {
-        if (n == exit) continue;
+        Map<CFGNode, CFGNode> ipd = new LinkedHashMap<>();
+        for (CFGNode n : nodes) {
+            if (n == exit) continue;
 
-        Set<CFGNode> strict = new LinkedHashSet<>(postDom.get(n));
-        strict.remove(n);
-        if (strict.isEmpty()) continue;
+            Set<CFGNode> strict = new LinkedHashSet<>(postDom.get(n));
+            strict.remove(n);
+            if (strict.isEmpty()) continue;
 
-        // El IPD es el elemento de strict con el PostDom MAS PEQUEÑO
-        // (el mas cercano en el arbol = el que post-domina a menos nodos)
-        // pero que NO sea EXIT salvo que sea el unico candidato
-        CFGNode candidate = null;
-        int minSize = Integer.MAX_VALUE;
+            CFGNode candidate = null;
+            for (CFGNode m : strict) {
+                boolean closest = true;
+                for (CFGNode other : strict) {
+                    if (other == m) continue;
+                    if (!postDom.getOrDefault(m, Collections.emptySet()).contains(other)) {
+                        closest = false;
+                        break;
+                    }
+                }
+                if (closest) {
+                    candidate = m;
+                    break;
+                }
+            }
 
-        for (CFGNode m : strict) {
-            if (m == exit) continue; // saltar EXIT en primera pasada
-            int size = postDom.getOrDefault(m, Collections.emptySet()).size();
-            if (size < minSize) {
-                minSize = size;
-                candidate = m;
+            if (candidate != null) {
+                ipd.put(n, candidate);
             }
         }
-
-        // si no encontro nada (solo habia EXIT en strict), usar EXIT
-        if (candidate == null) candidate = exit;
-
-        ipd.put(n, candidate);
+        return ipd;
     }
-    return ipd;
-}
 
     public Map<CFGNode, Set<CFGNode>> getAllPostDom() { return postDom; }
 }

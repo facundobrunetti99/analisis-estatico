@@ -85,6 +85,95 @@ public class DotExporter {
         return sb.toString();
     }
 
+    /*exporta el DDG */
+    public static String ddgToDot(List<CFGNode> nodes, DDGBuilder ddgBuilder) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("digraph DDG {\n");
+        sb.append("  node [shape=box, fontname=\"Courier\"];\n");
+
+        appendNodes(sb, nodes);
+        sb.append("\n");
+        for (Map.Entry<CFGNode, Set<CFGNode>> e : ddgBuilder.getAllDDG().entrySet()) {
+            CFGNode useNode = e.getKey();
+            for (CFGNode defNode : e.getValue()) {
+                sb.append("  ").append(defNode.dotId())
+                  .append(" -> ").append(useNode.dotId())
+                  .append(" [color=blue, label=\"")
+                  .append(String.join(",", ddgBuilder.getVariables(useNode, defNode)))
+                  .append("\"];\n");
+            }
+        }
+        sb.append("}\n");
+        return sb.toString();
+    }
+
+    /*exporta el PDG combinando CDG y DDG */
+    public static String pdgToDot(List<CFGNode> nodes, Map<CFGNode, Set<CFGNode>> cdg, DDGBuilder ddgBuilder) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("digraph PDG {\n");
+        sb.append("  node [shape=box, fontname=\"Courier\"];\n");
+
+        appendNodes(sb, nodes);
+        sb.append("\n");
+        for (Map.Entry<CFGNode, Set<CFGNode>> e : cdg.entrySet()) {
+            CFGNode dependent = e.getKey();
+            for (CFGNode controller : e.getValue()) {
+                sb.append("  ").append(controller.dotId())
+                  .append(" -> ").append(dependent.dotId())
+                  .append(" [style=dashed, color=red, label=\"control\"];\n");
+            }
+        }
+        for (Map.Entry<CFGNode, Set<CFGNode>> e : ddgBuilder.getAllDDG().entrySet()) {
+            CFGNode useNode = e.getKey();
+            for (CFGNode defNode : e.getValue()) {
+                sb.append("  ").append(defNode.dotId())
+                  .append(" -> ").append(useNode.dotId())
+                  .append(" [color=blue, label=\"")
+                  .append(String.join(",", ddgBuilder.getVariables(useNode, defNode)))
+                  .append("\"];\n");
+            }
+        }
+        sb.append("}\n");
+        return sb.toString();
+    }
+
+    /*exporta un CFG reducido a los nodos del slice */
+    public static String sliceCfgToDot(List<CFGNode> nodes, Set<CFGNode> slice) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("digraph SliceCFG {\n");
+        sb.append("  node [shape=box, fontname=\"Courier\"];\n");
+
+        for (CFGNode n : nodes) {
+            if (!slice.contains(n) || n.isEntry || n.isExit) continue;
+            String style = ", style=filled, fillcolor=lightgreen";
+            sb.append("  ").append(n.dotId())
+              .append(" [label=\"").append(n.dotLabel()).append("\"")
+              .append(style).append("];\n");
+        }
+        sb.append("\n");
+        for (CFGNode n : nodes) {
+            if (!slice.contains(n) || n.isEntry || n.isExit) continue;
+            for (CFGNode succ : n.successors) {
+                if (slice.contains(succ) && !succ.isEntry && !succ.isExit) {
+                    sb.append("  ").append(n.dotId()).append(" -> ").append(succ.dotId()).append(";\n");
+                }
+            }
+        }
+        sb.append("}\n");
+        return sb.toString();
+    }
+
+    private static void appendNodes(StringBuilder sb, List<CFGNode> nodes) {
+        for (CFGNode n : nodes) {
+            String style = "";
+            if (n.isEntry) style = ", style=filled, fillcolor=lightblue";
+            else if (n.isExit) style = ", style=filled, fillcolor=lightyellow";
+            sb.append("  ").append(n.dotId())
+              .append(" [label=\"").append(n.dotLabel()).append("\"")
+              .append(style).append("];\n");
+        }
+    }
+
     public static void writeToFile(String content, String filename) throws IOException {
         try (PrintWriter pw = new PrintWriter(new FileWriter(filename))) {
             pw.print(content);

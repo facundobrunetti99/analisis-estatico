@@ -1,7 +1,9 @@
 package org.example.cfg;
 
 import org.example.ast.*;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CFGBuilder {
 
@@ -45,12 +47,15 @@ public class CFGBuilder {
 
     private CFGNode buildAssign(AssignNode a, CFGNode next) {
         CFGNode block = new CFGNode(a.var + " = " + a.expr);
+        block.setDefinedVariable(a.var);
+        block.addUsedVariables(collectUses(a.expr));
         block.addSuccessor(next);
         return block;
     }
 
     private CFGNode buildReturn(ReturnNode r) {
         CFGNode block = new CFGNode("return " + r.expr);
+        block.addUsedVariables(collectUses(r.expr));
         block.addSuccessor(exit);
         return block;
     }
@@ -59,6 +64,7 @@ public class CFGBuilder {
         CFGNode thenFirst = buildStatements(ifNode.thenBranch, next);
         CFGNode elseFirst = buildStatements(ifNode.elseBranch, next);
         CFGNode condBlock = new CFGNode("if (" + ifNode.condition + ")");
+        condBlock.addUsedVariables(collectUses(ifNode.condition));
         condBlock.addSuccessor(thenFirst);
         condBlock.addSuccessor(elseFirst);
         return condBlock;
@@ -66,9 +72,26 @@ public class CFGBuilder {
 
     private CFGNode buildWhile(WhileNode whileNode, CFGNode next) {
         CFGNode condBlock = new CFGNode("while (" + whileNode.condition + ")");
+        condBlock.addUsedVariables(collectUses(whileNode.condition));
         CFGNode bodyFirst = buildStatements(whileNode.body, condBlock);
         condBlock.addSuccessor(bodyFirst);
         condBlock.addSuccessor(next);
         return condBlock;
+    }
+
+    private Set<String> collectUses(ExpressionNode expr) {
+        Set<String> uses = new LinkedHashSet<>();
+        collectUses(expr, uses);
+        return uses;
+    }
+
+    private void collectUses(ExpressionNode expr, Set<String> uses) {
+        if (expr instanceof VarNode) {
+            uses.add(((VarNode) expr).name);
+        } else if (expr instanceof BinaryOpNode) {
+            BinaryOpNode bin = (BinaryOpNode) expr;
+            collectUses(bin.left, uses);
+            collectUses(bin.right, uses);
+        }
     }
 }

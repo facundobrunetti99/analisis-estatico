@@ -34,6 +34,27 @@ public class CDGBuilder {
                 }
             }
         }
+
+        addInitialControlDependencies();
+    }
+
+    private void addInitialControlDependencies() {
+        CFGNode initial = findInitialNode();
+        if (initial == null) return;
+
+        for (CFGNode n : nodes) {
+            if (n == initial || n.isExit) continue;
+            if (cdg.get(n).isEmpty()) {
+                cdg.get(n).add(initial);
+            }
+        }
+    }
+
+    private CFGNode findInitialNode() {
+        for (CFGNode n : nodes) {
+            if (n.isEntry) return n;
+        }
+        return nodes.isEmpty() ? null : nodes.get(0);
     }
 
     /**retorna el conjunto de nodos de los que n depende en control */
