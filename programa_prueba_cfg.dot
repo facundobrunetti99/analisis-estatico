@@ -1,0 +1,25 @@
+digraph CFG {
+  node [shape=box, fontname="Courier"];
+  B0 [label="ENTRY", style=filled, fillcolor=lightblue];
+  B9 [label="a = 1"];
+  B8 [label="b = 2"];
+  B6 [label="while (a)"];
+  B7 [label="b = b + a"];
+  B5 [label="if (b)"];
+  B3 [label="c = b + 1"];
+  B4 [label="c = a + b"];
+  B2 [label="return c"];
+  B1 [label="EXIT", style=filled, fillcolor=lightyellow];
+
+  B0 -> B9;
+  B9 -> B8;
+  B8 -> B6;
+  B6 -> B7;
+  B6 -> B5;
+  B7 -> B6;
+  B5 -> B3;
+  B5 -> B4;
+  B3 -> B2;
+  B4 -> B2;
+  B2 -> B1;
+}

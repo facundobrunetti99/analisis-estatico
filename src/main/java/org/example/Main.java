@@ -34,10 +34,10 @@ public class Main {
             System.exit(1);
         }
 
-        System.out.println("=".repeat(60));
+        System.out.println(separator());
         System.out.println("TP1 - Analisis Estatico de Programas");
         System.out.println("Archivo: " + inputFile);
-        System.out.println("=".repeat(60));
+        System.out.println(separator());
 
         //Parsing
         System.out.println("\n[1] Parseando...");
@@ -183,7 +183,7 @@ public class Main {
             System.out.println("    SLICE CFG -> " + sliceFile);
         }
 
-        System.out.println("\n" + "=".repeat(60));
+        System.out.println("\n" + separator());
         System.out.println("Para visualizar los grafos instala Graphviz y ejecuta:");
         System.out.println("  dot -Tpng " + cfgFile  + " -o " + base + "_cfg.png");
         System.out.println("  dot -Tpng " + pdomFile + " -o " + base + "_pdom.png");
@@ -193,7 +193,13 @@ public class Main {
         if (sliceFile != null) {
             System.out.println("  dot -Tpng " + sliceFile + " -o " + sliceFile.replace(".dot", ".png"));
         }
-        System.out.println("=".repeat(60));
+        System.out.println(separator());
+    }
+
+    private static String separator() {
+        char[] chars = new char[60];
+        Arrays.fill(chars, '=');
+        return new String(chars);
     }
 
     private static String formatDefinitions(Set<Definition> definitions) {

@@ -1,0 +1,35 @@
+digraph PDG {
+  node [shape=box, fontname="Courier"];
+  B0 [label="ENTRY", style=filled, fillcolor=lightblue];
+  B9 [label="a = 1"];
+  B8 [label="b = 2"];
+  B6 [label="while (a)"];
+  B7 [label="b = b + a"];
+  B5 [label="if (b)"];
+  B3 [label="c = b + 1"];
+  B4 [label="c = a + b"];
+  B2 [label="return c"];
+  B1 [label="EXIT", style=filled, fillcolor=lightyellow];
+
+  B0 -> B9 [style=dashed, color=red, label="control"];
+  B0 -> B8 [style=dashed, color=red, label="control"];
+  B6 -> B6 [style=dashed, color=red, label="control"];
+  B6 -> B7 [style=dashed, color=red, label="control"];
+  B0 -> B5 [style=dashed, color=red, label="control"];
+  B5 -> B3 [style=dashed, color=red, label="control"];
+  B5 -> B4 [style=dashed, color=red, label="control"];
+  B0 -> B2 [style=dashed, color=red, label="control"];
+  B9 -> B6 [color=blue, label="a"];
+  B7 -> B7 [color=blue, label="b"];
+  B8 -> B7 [color=blue, label="b"];
+  B9 -> B7 [color=blue, label="a"];
+  B7 -> B5 [color=blue, label="b"];
+  B8 -> B5 [color=blue, label="b"];
+  B7 -> B3 [color=blue, label="b"];
+  B8 -> B3 [color=blue, label="b"];
+  B9 -> B4 [color=blue, label="a"];
+  B7 -> B4 [color=blue, label="b"];
+  B8 -> B4 [color=blue, label="b"];
+  B3 -> B2 [color=blue, label="c"];
+  B4 -> B2 [color=blue, label="c"];
+}

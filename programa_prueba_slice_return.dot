@@ -1,0 +1,21 @@
+digraph SliceCFG {
+  node [shape=box, fontname="Courier"];
+  B9 [label="a = 1", style=filled, fillcolor=lightgreen];
+  B8 [label="b = 2", style=filled, fillcolor=lightgreen];
+  B6 [label="while (a)", style=filled, fillcolor=lightgreen];
+  B7 [label="b = b + a", style=filled, fillcolor=lightgreen];
+  B5 [label="if (b)", style=filled, fillcolor=lightgreen];
+  B3 [label="c = b + 1", style=filled, fillcolor=lightgreen];
+  B4 [label="c = a + b", style=filled, fillcolor=lightgreen];
+  B2 [label="return c", style=filled, fillcolor=lightgreen];
+
+  B9 -> B8;
+  B8 -> B6;
+  B6 -> B7;
+  B6 -> B5;
+  B7 -> B6;
+  B5 -> B3;
+  B5 -> B4;
+  B3 -> B2;
+  B4 -> B2;
+}
