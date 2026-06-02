@@ -3,7 +3,7 @@ package org.example.cfg;
 import java.util.*;
 
 /**
- *calcula post-dominadores usando el algoritmo iterativo clasico.
+ *calcula post-dominadores usando el algoritmo iterativo
  *n post-domina a m  <=>  todo camino de m hacia EXIT pasa por n.
  *ecuacion de punto fijo (sobre el CFG INVERSO):
  *postDom(EXIT) = {EXIT}
